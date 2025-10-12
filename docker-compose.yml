@@ -1,0 +1,18 @@
+services:
+  goth-template:
+    container_name: goth-template
+    image: effiware/goth-template:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_HASH: "abcd123"
+    platform: linux/amd64
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    env_file:
+      - .env
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true

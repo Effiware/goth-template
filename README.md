@@ -1,10 +1,10 @@
 # 🚀 GOTH Stack Complete Setup
 
-[![Go Version](https://img.shields.io/badge/Go-1.23.2-00ADD8?style=flat-square&logo=go)](https://golang.org/doc/go1.23)
-[![HTMX](https://img.shields.io/badge/HTMX-1.9.11-purple?style=flat-square)](https://htmx.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com)
-[![Alpine.js](https://img.shields.io/badge/Alpine.js-3.13.7-2D3441?style=flat-square)](https://alpinejs.dev)
-[![Templ](https://img.shields.io/badge/Templ-0.2.778-red?style=flat-square)](https://templ.guide)
+[![Go Version](https://img.shields.io/badge/Go-1.25.0-00ADD8?style=flat-square&logo=go)](https://go.dev/doc/go1.25)
+[![Templ](https://img.shields.io/badge/Templ-0.3.943-red?style=flat-square)](https://templ.guide)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.11-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com)
+[![HTMX](https://img.shields.io/badge/HTMX-2.0.7-purple?style=flat-square)](https://htmx.org)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-3.15.0-2D3441?style=flat-square)](https://alpinejs.dev)
 
 A modern, fully configured starter template for building fast, type-safe web applications using Go, HTMX, Tailwind CSS, Alpine.js, and Templ. This stack provides an incredible developer experience with type safety from your database all the way to your HTML.
 
@@ -20,58 +20,100 @@ A modern, fully configured starter template for building fast, type-safe web app
 
 ### Prerequisites
 
-- Go v1.23.2 or higher
-- npm v10.9.0
-- node v23.2.0
-- Air v1.61.1
-- Templ CLI v0.2.778
+At least the following major versions are required (when installing on your local machine):
 
-### Installation
+- Go v1.25
+- npm v11.4
+- node v24.4
+- Air v1.63.0
+- Templ CLI 0.3.943
+- GNU Make 3.81 (recommended, but optional)
 
-Install dependencies:
-```bash
-npm install
-```
+Or just use Docker for everything:
 
-### Running Locally
+- Docker 28.1 (recommended, but optional)
 
-Start the development server:
-```bash
-make run
-```
+---
 
-This will:
-- Start the Templ proxy server on the value of TEMPL_PROXY_PORT defined in the .env file.
-- Start the Go server on the value of APP_PORT, also defined in the .env file.
-- Enable hot reloading for all file changes.
+## Development Setup
 
-Access the application at: 
-```bash
-http://localhost:<TEMPL_PROXY_PORT>
-```
+### Option 1: Local Machine
 
-### Running as Container
+1. **Install dependencies**
+   ```bash
+   make prep
+   ```
 
-1. Build the container:
-```bash
-docker build -t <image-tag> .
-```
+2. **Build Tailwind and Go**
+   ```bash
+   make build
+   ```
 
-2. Run the container:
-```bash
-docker run --rm \
-  --env-file .env \
-  -p <local-port>:<app-port> \
-  -t <image-tag>
-```
+3. **Run the application** with Hot Reload using Air 
+   ```bash
+    make air
+    ```
 
-Access the containerized application at:
+### Option 2: Docker (Recommended)
+
+Either do `make prep` (will also install Go/Node dependencies on the host machine) or copy `.env.example` to `.env` and modify as needed.
+
+1. **Build the Docker image**
+   ```bash
+   make docker-build
+   ```
+
+2. **Run the Docker container**
+   ```bash
+   make docker-up
+   ```
+
+3. **Stop the Docker container**
+   ```bash
+   make docker-down
+   ```
+
+---
+
+## Access the Application
+
+In both cases, open your browser and navigate to:
+
 ```bash
 http://localhost:<local-port>
 ```
 
 Note: The `<app-port>` should match the `APP_PORT` in your `.env` file.
 
-## In detail explanation
+---
+
+## Notes
+
+### Port taken
+If you get an error that a port is already taken, you can change the port in the `.env` file or kill the process using it:
+
+```bash
+sudo lsof -i -P | grep LISTEN | grep :<PORT>
+```
+Then kill the process using the PID:
+```bash
+sudo kill -9 <PID>
+```
+
+### Remove package
+To remove a package, use the following command:
+```bash
+go mod edit -dropreplace <package>
+go mod tidy
+```
+
+If you used go install package@latest then to remove:
+
+```bash
+go install package@none
+go clean -cache -modcache
+```
+
+### Hot-reloading explanation
 
 There is an in detail explanation of how the hot reloading works in [this](https://medium.com/ostinato-rigore/go-htmx-templ-tailwind-complete-project-setup-hot-reloading-2ca1ba6c28be) article.

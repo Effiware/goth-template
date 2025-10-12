@@ -1,7 +1,7 @@
 package main
 
 import (
-	"goth-complete-setup/internal/server"
+	"github.com/effiware/goth-template/internal/server"
 	"log"
 	"os"
 	"strconv"

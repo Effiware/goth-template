@@ -1,8 +1,8 @@
 package server
 
 import (
-	"goth-complete-setup/internal"
-	"goth-complete-setup/internal/api_errors"
+	"github.com/effiware/goth-template/internal"
+	"github.com/effiware/goth-template/internal/api_errors"
 	"log"
 	"net/http"
 

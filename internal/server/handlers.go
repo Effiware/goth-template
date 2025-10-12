@@ -1,7 +1,7 @@
 package server
 
 import (
-	"goth-complete-setup/internal/components"
+	"github.com/effiware/goth-template/internal/components"
 	"net/http"
 )
 
