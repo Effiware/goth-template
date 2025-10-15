@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/effiware/goth-template/internal"
-	"github.com/effiware/goth-template/internal/api_errors"
 	"log"
 	"net/http"
+
+	"github.com/effiware/goth-template/internal"
+	"github.com/effiware/goth-template/internal/api_errors"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
@@ -20,6 +21,8 @@ func (api *Api) RegisterRoutes() *chi.Mux {
 	r.Handle("/static/*", http.FileServer(http.FS(internal.StaticFiles)))
 
 	r.HandleFunc("/", NewHandler(root))
+
+	r.Post("/clicked", NewHandler(click))
 
 	return r
 }

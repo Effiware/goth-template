@@ -7,13 +7,19 @@ templ Home() {
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <title>Hello world</title>
             <link href="/static/css/tailwind.css" rel="stylesheet">
-            <script src="https://unpkg.com/htmx.org@2.0.7" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
-            <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js" integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ" crossorigin="anonymous"></script>
+            <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.5.0/dist/cdn.min.js"></script>
         </head>
         <div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600">
             <div class="bg-white rounded-lg shadow-xl p-8 m-4">
                 <h1 class="text-4xl font-bold text-gray-800 mb-2">Hello world</h1>
-                <p class="text-gray-600">Welcome to your application</p>
+                <p id="parent-click" class="text-gray-600">Welcome to your application - clicks: 0</p>
+                <button hx-post="/clicked"
+                    hx-trigger="click"
+                    hx-target="#parent-click"
+                    hx-swap="innerHTML">
+                    Click Me!
+                </button>
             </div>
         </div>
      </html>
