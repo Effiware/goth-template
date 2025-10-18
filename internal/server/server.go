@@ -6,15 +6,14 @@ import (
 	"time"
 )
 
-type Api struct{}
+type HdaAndApi struct{}
 
-func NewServer(port int) *http.Server {
-
-	api := &Api{}
+func HttpServer(port int) *http.Server {
+	hdaAndApi := &HdaAndApi{}
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
-		Handler:      api.RegisterRoutes(),
+		Handler:      hdaAndApi.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,

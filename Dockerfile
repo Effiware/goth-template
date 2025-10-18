@@ -20,7 +20,7 @@ RUN go mod download
 RUN npm ci
 
 RUN npm run build
-RUN go build -o ./bin/main cmd/main/main.go
+RUN go build -o ./bin/main cmd/server/main.go
 
 FROM alpine:latest
 WORKDIR /root/

@@ -1,18 +1,42 @@
 package server
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
-
-	"github.com/effiware/goth-template/internal/components"
 )
 
-var clicks int = 0
+type HdaHandlerT func(w http.ResponseWriter, request *http.Request) error
 
-func root(w http.ResponseWriter, r *http.Request) error {
-	return Render(w, r, components.Home())
+func HdaHandlerWithJsonFallback(hdaHandler HdaHandlerT) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := hdaHandler(w, r)
+		if err != nil {
+			log.Printf("Error: %s", err.Error())
+			if clientErr, ok := err.(*ClientErr); ok {
+				JsonHandler(w, clientErr.HttpCode, clientErr)
+			} else {
+				JsonHandler(w, http.StatusInternalServerError,
+					InternalErr{
+						HttpCode: http.StatusInternalServerError,
+						Message:  "internal server error",
+					},
+				)
+			}
+		}
+	}
 }
 
-func click(w http.ResponseWriter, r *http.Request) error {
-	clicks++
-	return Render(w, r, components.Click(clicks))
+func JsonHandler(w http.ResponseWriter, code int, payload any) {
+	w.Header().Set("Content-Type", "application/json")
+	jsonPay, err := json.Marshal(payload)
+
+	if err != nil {
+		log.Printf("Error when marshaling JSON: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(code)
+	w.Write(jsonPay)
 }

@@ -10,11 +10,11 @@ prep:
 	@cp .env.example .env
 
 build-local:
-	@go build -o ./bin/main cmd/main/main.go
+	@go build -o ./bin/main cmd/server/main.go
 
 build:
 	@npm run build
-	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/main cmd/main/main.go
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/main cmd/server/main.go
 
 templ:
 	@go tool templ generate --watch --proxy=http://localhost:$(APP_PORT) --proxyport=$(TEMPL_PROXY_PORT) --open-browser=false --proxybind="0.0.0.0"
@@ -33,7 +33,7 @@ docker-build:
 	@docker-compose -f docker-compose.yml build --no-cache
 
 docker-up:
-	@docker-compose -f docker-compose.yml up
+	@docker-compose -f docker-compose.yml up --no-recreate
 
 docker-down:
 	@docker-compose -f docker-compose.yml down
