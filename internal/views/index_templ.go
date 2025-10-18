@@ -8,6 +8,8 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "github.com/effiware/goth-template/internal/views/components"
+
 func Index() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,7 +31,15 @@ func Index() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"es\" class=\"dark\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>GOTH template</title><link href=\"/static/img/favicon.ico\" type=\"image/x-icon\" rel=\"icon\"><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><script src=\"https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js\" integrity=\"sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ\" crossorigin=\"anonymous\"></script><script defer src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.5.0/dist/cdn.min.js\"></script></head><div class=\"min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600\"><div class=\"bg-white rounded-lg shadow-xl p-8 m-4\"><h1 class=\"text-4xl font-bold text-gray-800 mb-2\">Hello world</h1><p id=\"parent-click\" class=\"text-gray-600\">Welcome to your application - clicks: 0</p><button hx-post=\"/clicked\" hx-trigger=\"click\" hx-target=\"#parent-click\" hx-swap=\"innerHTML\">Click Me!</button></div></div></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"es\" class=\"dark\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>GOTH template</title><link href=\"/static/img/favicon.ico\" type=\"image/x-icon\" rel=\"icon\"><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><script src=\"https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js\" integrity=\"sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ\" crossorigin=\"anonymous\"></script><script defer src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.5.0/dist/cdn.min.js\"></script></head><div class=\"min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600 pb-20\"><div class=\"bg-white rounded-lg shadow-xl p-8 m-4\"><h1 class=\"text-4xl font-bold text-gray-800 mb-2\">Welcome to GOTH Template!</h1><h2 class=\"text-gray-600 mb-1\">It serves content by both Hypermedia (HDA) and JSON API (API) </h2><h3 class=\"text-gray-600 mb-2\">You increment counter via API by doing: <code>curl -X  &quotPOST&quot  http://localhost:8080/api/v1/clicks/increment</code></h3>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = components.Click().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex justify-center\"><button hx-post=\"/clicked\" hx-trigger=\"click\" hx-target=\"#parent-click\" hx-swap=\"innerHTML\" class=\"mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600\">Click to increment via HDA!</button></div></div></div></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

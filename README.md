@@ -33,6 +33,15 @@ Or just use Docker for everything:
 
 - Docker 28.1 (recommended, but optional)
 
+### Usage
+
+1. Start the server using either local setup or Docker (see below).
+2. Open your browser and navigate to `http://localhost:<app-port>` (default is 8080).
+3. Play with HDA (interactions, dynamic content loading, etc.) and see changes instantly with hot reload!
+4. Play with API 
+   - get clicks count: `curl http://localhost:8080/api/v1/clicks`
+   - increment clicks count: `curl -X POST http://localhost:8080/api/v1/clicks/increment`
+
 ---
 
 ## Development Setup

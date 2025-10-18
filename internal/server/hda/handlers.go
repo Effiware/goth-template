@@ -1,23 +1,25 @@
-package server
+package hda
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/effiware/goth-template/internal/server/http_errors"
 )
 
-type HdaHandlerT func(w http.ResponseWriter, request *http.Request) error
+type ViewHandlerT func(w http.ResponseWriter, request *http.Request) error
 
-func HdaHandlerWithJsonFallback(hdaHandler HdaHandlerT) http.HandlerFunc {
+func WithJsonFallback(viewHandler ViewHandlerT) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := hdaHandler(w, r)
+		err := viewHandler(w, r)
 		if err != nil {
 			log.Printf("Error: %s", err.Error())
-			if clientErr, ok := err.(*ClientErr); ok {
+			if clientErr, ok := err.(*http_errors.ClientErr); ok {
 				JsonHandler(w, clientErr.HttpCode, clientErr)
 			} else {
 				JsonHandler(w, http.StatusInternalServerError,
-					InternalErr{
+					http_errors.InternalErr{
 						HttpCode: http.StatusInternalServerError,
 						Message:  "internal server error",
 					},

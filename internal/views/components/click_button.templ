@@ -1,5 +1,9 @@
 package components
 
-templ Click(num int) {
-    <p id="parent-click" class="text-gray-600">Welcome to your application - clicks: { num }</p>
+import "github.com/effiware/goth-template/internal/server/models"
+
+var clicks *models.Clicks = models.ClicksStore
+
+templ Click() {
+    <p id="parent-click" class="text-xl text-gray-800 mb-3">No of clicks (total): { clicks.GetCount() }</p>
 }

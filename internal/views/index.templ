@@ -1,5 +1,6 @@
 package views
 
+import "github.com/effiware/goth-template/internal/views/components"
 
 templ Index() {
     <html lang="es" class="dark">
@@ -12,16 +13,21 @@ templ Index() {
             <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js" integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ" crossorigin="anonymous"></script>
             <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.5.0/dist/cdn.min.js"></script>
         </head>
-        <div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600">
+        <div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600 pb-20">
             <div class="bg-white rounded-lg shadow-xl p-8 m-4">
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">Hello world</h1>
-                <p id="parent-click" class="text-gray-600">Welcome to your application - clicks: 0</p>
-                <button hx-post="/clicked"
-                    hx-trigger="click"
-                    hx-target="#parent-click"
-                    hx-swap="innerHTML">
-                    Click Me!
-                </button>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome to GOTH Template!</h1>
+                <h2 class="text-gray-600 mb-1">It serves content by both Hypermedia (HDA) and JSON API (API) </h2>
+                <h3 class="text-gray-600 mb-2">You increment counter via API by doing: <code>curl -X  &quotPOST&quot  http://localhost:8080/api/v1/clicks/increment</code></h3>
+                @components.Click()
+                <div class="flex justify-center">
+                    <button hx-post="/clicked"
+                        hx-trigger="click"
+                        hx-target="#parent-click"
+                        hx-swap="innerHTML"
+                        class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Click to increment via HDA!
+                    </button>
+                </div>
             </div>
         </div>
      </html>
