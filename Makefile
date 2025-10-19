@@ -6,6 +6,7 @@
 prep:
 	@go get -tool github.com/a-h/templ/cmd/templ@latest
 	@go get -tool github.com/air-verse/air@latest
+	@go get -tool github.com/swaggo/swag/cmd/swag@latest
 	@npm install
 	@cp .env.example .env
 
