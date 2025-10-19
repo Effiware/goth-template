@@ -1,0 +1,56 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "This is an example server for a GOTH template application.",
+        "title": "GOTH Template API",
+        "contact": {
+            "name": "EffiSupport",
+            "url": "https://www.effiware.com/contact",
+            "email": "contact@effiware.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/clicks": {
+            "get": {
+                "description": "Retrieve the total number of clicks recorded in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clicks"
+                ],
+                "summary": "Get the number of clicks",
+                "responses": {}
+            }
+        },
+        "/clicks/increment": {
+            "post": {
+                "description": "Increment the total number of clicks recorded in the system by one",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clicks"
+                ],
+                "summary": "Increment the number of clicks",
+                "responses": {}
+            }
+        }
+    }
+}

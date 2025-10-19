@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/effiware/goth-template/internal/docs"
 	"github.com/effiware/goth-template/internal/server/models"
 )
 
@@ -33,6 +34,12 @@ func JsonHandler(endpointHandler EndpointHandlerT) http.HandlerFunc {
 	}
 }
 
+// @Summary		Get the number of clicks
+// @Description	Retrieve the total number of clicks recorded in the system
+// @Tags		clicks
+// @Accept		json
+// @Produce		json
+// @Router		/clicks [get]
 func GetClicks(w http.ResponseWriter, r *http.Request) (int, any, error) {
 	ctx := r.Context()
 	_ = ctx // currently unused, but may be useful for logging or tracing in the future
@@ -40,6 +47,12 @@ func GetClicks(w http.ResponseWriter, r *http.Request) (int, any, error) {
 	return http.StatusOK, models.Clicks{Count: clicks.GetCount()}, nil
 }
 
+// @Summary		Increment the number of clicks
+// @Description	Increment the total number of clicks recorded in the system by one
+// @Tags		clicks
+// @Accept		json
+// @Produce		json
+// @Router		/clicks/increment [post]
 func IncrementClicks(w http.ResponseWriter, r *http.Request) (int, any, error) {
 	ctx := r.Context()
 	_ = ctx // currently unused, but may be useful for logging or tracing in the future

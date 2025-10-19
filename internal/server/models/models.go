@@ -3,7 +3,7 @@ package models
 import "sync/atomic"
 
 type Clicks struct {
-	Count uint64 `json:"count"`
+	Count uint64 `json:"count" example:"17"`
 }
 
 func (c *Clicks) Increment() {

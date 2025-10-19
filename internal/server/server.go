@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	_ "github.com/effiware/goth-template/internal/docs"
 )
 
 type HdaAndApi struct{}

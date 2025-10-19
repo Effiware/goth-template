@@ -1,7 +1,7 @@
 -include .env
 
 ### Execute on local machine
-.PHONY: prep build-local build templ notify-templ-proxy air
+.PHONY: prep build-local build swag templ notify-templ-proxy air
 
 prep:
 	@go get -tool github.com/a-h/templ/cmd/templ@latest
@@ -15,6 +15,9 @@ build-local:
 build:
 	@npm run build
 	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/main cmd/server/main.go
+
+swag:
+	@go tool swag init -g ./internal/embed.go -o ./internal/docs
 
 templ:
 	@go tool templ generate --watch --proxy=http://localhost:$(APP_PORT) --proxyport=$(TEMPL_PROXY_PORT) --open-browser=false --proxybind="0.0.0.0"

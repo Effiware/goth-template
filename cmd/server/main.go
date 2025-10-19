@@ -10,7 +10,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-// main is the entry point of the application.
 func main() {
 	port, err := strconv.Atoi(os.Getenv("APP_PORT"))
 	if err != nil {

@@ -1,0 +1,40 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact:
+    email: contact@effiware.com
+    name: EffiSupport
+    url: https://www.effiware.com/contact
+  description: This is an example server for a GOTH template application.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: GOTH Template API
+  version: "1.0"
+paths:
+  /clicks:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the total number of clicks recorded in the system
+      produces:
+      - application/json
+      responses: {}
+      summary: Get the number of clicks
+      tags:
+      - clicks
+  /clicks/increment:
+    post:
+      consumes:
+      - application/json
+      description: Increment the total number of clicks recorded in the system by
+        one
+      produces:
+      - application/json
+      responses: {}
+      summary: Increment the number of clicks
+      tags:
+      - clicks
+schemes:
+- http
+swagger: "2.0"

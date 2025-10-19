@@ -4,10 +4,12 @@ import (
 	"net/http"
 
 	"github.com/effiware/goth-template/internal"
+	_ "github.com/effiware/goth-template/internal/docs"
 	"github.com/effiware/goth-template/internal/server/api"
 	"github.com/effiware/goth-template/internal/server/hda"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func (hdaAndApi *HdaAndApi) RegisterRoutes() *chi.Mux {
@@ -15,6 +17,8 @@ func (hdaAndApi *HdaAndApi) RegisterRoutes() *chi.Mux {
 
 	r.Use(middleware.Heartbeat("/ping"))
 	r.Use(middleware.Logger)
+	r.Handle("/docs/*", http.FileServer(http.FS(internal.DocsFS)))
+	r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL("/docs/swagger.json")))
 
 	r.HandleFunc("/", hda.WithJsonFallback(hda.RenderRoot))
 	r.Handle("/static/*", http.FileServer(http.FS(internal.StaticFiles)))
