@@ -1,11 +1,18 @@
 basePath: /api/v1
+definitions:
+  api.Clicks:
+    properties:
+      count:
+        example: 17
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact:
     email: contact@effiware.com
-    name: EffiSupport
+    name: Effi-Support
     url: https://www.effiware.com/contact
-  description: This is an example server for a GOTH template application.
+  description: JSON API of the GOTH stack template.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -14,27 +21,52 @@ info:
 paths:
   /clicks:
     get:
-      consumes:
-      - application/json
-      description: Retrieve the total number of clicks recorded in the system
+      description: Total number of clicks recorded in the system
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Clicks'
       summary: Get the number of clicks
       tags:
       - clicks
   /clicks/increment:
     post:
-      consumes:
-      - application/json
-      description: Increment the total number of clicks recorded in the system by
-        one
+      description: Increment the click total by one and return the new value
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Clicks'
       summary: Increment the number of clicks
       tags:
       - clicks
+  /readyz:
+    get:
+      description: 200 when Postgres and Redis are reachable and the instance is not
+        draining; 503 otherwise.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ready
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: draining or a dependency is unreachable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Readiness probe
+      tags:
+      - health
 schemes:
 - http
 swagger: "2.0"
