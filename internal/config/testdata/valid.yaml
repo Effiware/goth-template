@@ -1,0 +1,27 @@
+server:
+  name: goth-template-test
+  port: 8083
+  host: localhost
+  timeout: 30
+  log_level: DEBUG
+  environment: test
+  sync_interval_min: 5
+
+database:
+  engine: postgres
+  url: postgres://user:pass@localhost:5432/goth
+
+redis:
+  url: redis://localhost:6379
+
+session:
+  max_age: 3600
+  secure: false
+
+otlp:
+  url: https://otel.example.com:4318
+  protocol: http
+  secure: false
+
+metrics:
+  enabled: true

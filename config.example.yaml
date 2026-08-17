@@ -1,0 +1,37 @@
+# Copy to config.yaml (`make prep` does it). Every key is overridable by env:
+# GOTH_TEMPLATE_SERVER_PORT, GOTH_TEMPLATE_DATABASE_URL, … (dots become underscores).
+
+server:
+  name: "goth-template-local"
+  port: 8080
+#  host: "localhost"
+  base_url: "http://localhost:8080"  # browser-reachable origin; the CSRF check compares against it
+#  timeout: 10  # seconds; read timeout — write is 3x, idle 6x
+  environment: "local"
+  log_level: "DEBUG"
+  drain_grace_sec: 0  # 5 by default — seconds to serve after SIGTERM with /readyz failing
+#  csp_report_only: true  # false by default — true to soak CSP changes
+  sync_interval_min: 60  # demo PeriodicRunner cadence; see also sync_at for the cron-driven runner
+
+database:
+  engine: "postgres"
+  url: "postgres://goth:STRONG_DB_PASSWORD1@localhost:5432/goth"
+  skip_migrations: false  # migrations run at startup; shouldn't be skipped in production
+#  pool_max_conns: 10  # unset = from the DSN, else pgx's max(4, NumCPU)
+
+# Empty url = no Redis: sessions fall back to cookie storage and the cache
+# wrappers become pass-through. Delete the section if the project never needs it.
+redis:
+  url: "redis://:REDIS_PASSWORD@localhost:6379/0"
+
+session:
+  max_age: 3600  # 1 hour by default
+  secure: false  # true by default; false is needed without HTTPS locally
+
+otlp:
+  url: "localhost:4317"  # host:port (scheme stripped); empty and no OTEL_* env = tracing off
+#  protocol: grpc  # grpc (default) | http
+#  secure: false  # default false (plaintext in-cluster hop); true for a TLS collector
+
+metrics:
+  enabled: true  # exposes /metrics

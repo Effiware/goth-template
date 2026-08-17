@@ -2,33 +2,99 @@ package views
 
 import "github.com/effiware/goth-template/internal/views/components"
 
-templ Index() {
-    <html lang="es" class="dark">
-        <head>
-            <meta charset="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <title>GOTH template</title>
-            <link href="/static/img/favicon.ico" type="image/x-icon" rel="icon"/>
-            <link href="/static/css/tailwind.css" rel="stylesheet">
-            <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js" integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ" crossorigin="anonymous"></script>
-            <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.5.0/dist/cdn.min.js"></script>
-        </head>
-        <div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600 pb-20">
-            <div class="bg-white rounded-lg shadow-xl p-8 m-4">
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome to GOTH Template!</h1>
-                <h2 class="text-gray-600 mb-1">It serves content by both Hypermedia (HDA) and JSON API (API) </h2>
-                <h3 class="text-gray-600 mb-2">You increment counter via API by doing: <code>curl -X  &quotPOST&quot  http://localhost:8080/api/v1/clicks/increment</code></h3>
-                @components.Click()
-                <div class="flex justify-center">
-                    <button hx-post="/clicked"
-                        hx-trigger="click"
-                        hx-target="#parent-click"
-                        hx-swap="innerHTML"
-                        class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                        Click to increment via HDA!
-                    </button>
-                </div>
-            </div>
-        </div>
-     </html>
+// pageHead is the shared <head>: meta, favicon, tailwind, htmx (+ its response
+// handling config), alpine. Assets are served locally — no CDN, so the CSP in
+// middlewares/security.go stays tight.
+templ pageHead(title string) {
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>{ title }</title>
+	<link href="/static/img/favicon.ico" type="image/x-icon" rel="icon"/>
+	<link href="/static/css/tailwind.css" rel="stylesheet"/>
+	<script src="/static/js/htmx-2.0.10/htmx.min.js"></script>
+	<!-- Keep in sync with hda.WithHTMLFallback: a status not listed here is
+	     dropped by htmx instead of swapping the error fragment. The catch-all
+	     MUST keep "error":true so failures never report as successful. -->
+	<meta name="htmx-config" content='{"responseHandling": [{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"403","swap":true,"error":true},{"code":"404","swap":true,"error":true},{"code":"409","swap":true,"error":true},{"code":"[45]..","swap":false,"error":true}]}'/>
+	<script defer src="/static/js/alpinejs-3.16.1/cdn.min.js"></script>
+	<style>
+		[x-cloak] { display: none !important; }
+	</style>
+}
+
+// baseURL is the browser-reachable origin (config server.base_url), used by the
+// curl snippet so it stays honest behind a proxy or a non-default port.
+templ Index(baseURL string, total int64, mine int64) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			@pageHead("GOTH template")
+		</head>
+		<body
+			class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+			x-data="{
+				darkMode: localStorage.getItem('theme') === 'dark',
+				toggleTheme() {
+					this.darkMode = !this.darkMode;
+					localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+					document.documentElement.classList.toggle('dark', this.darkMode);
+				}
+			}"
+			x-init="document.documentElement.classList.toggle('dark', darkMode)">
+			<div class="min-h-screen flex items-center justify-center p-4">
+				<div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8">
+					<div class="flex items-start justify-between mb-6">
+						<div>
+							<h1 class="text-3xl font-bold">Welcome to the GOTH template</h1>
+							<p class="text-gray-600 dark:text-gray-400 mt-1">
+								Go + Templ + HTMX + Tailwind, serving the same state over hypermedia (HDA) and JSON API.
+							</p>
+						</div>
+						<button
+							@click="toggleTheme()"
+							title="Toggle dark mode"
+							class="shrink-0 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+							<svg x-show="darkMode" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+							</svg>
+							<svg x-show="!darkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+							</svg>
+						</button>
+					</div>
+
+					<div id="click-panel" class="rounded-lg bg-gray-50 dark:bg-gray-900/50 p-6">
+						@components.Click(total, mine)
+						<div class="mt-4 flex flex-wrap items-center gap-3">
+							<button
+								hx-post="/clicked"
+								hx-trigger="click"
+								hx-target="#click-panel-counts"
+								hx-swap="outerHTML"
+								hx-indicator="#click-spinner"
+								class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
+								Click to increment via HDA
+							</button>
+							<span id="click-spinner" class="htmx-indicator">
+								@components.LoadingSpinner()
+							</span>
+						</div>
+					</div>
+
+					<div class="mt-6 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+						<p>The same counter over JSON:</p>
+						<pre class="overflow-x-auto rounded bg-gray-100 dark:bg-gray-900 p-3 text-xs"><code>curl { baseURL }/api/v1/clicks
+curl -X POST { baseURL }/api/v1/clicks/increment</code></pre>
+						<p>
+							Also wired up:
+							<a class="underline hover:no-underline" href="/swagger/index.html">/swagger</a>,
+							<a class="underline hover:no-underline" href="/readyz">/readyz</a>,
+							<a class="underline hover:no-underline" href="/metrics">/metrics</a>,
+							<a class="underline hover:no-underline" href="/ping">/ping</a>.
+						</p>
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
 }

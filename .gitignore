@@ -45,6 +45,9 @@ bin
 dist
 tmp
 node_modules
+internal/static/css/tailwind.css
 *.env
 !.env.example
-internal/static/css/tailwind.css
+config.yaml
+!config.example.yaml
+coverage.out

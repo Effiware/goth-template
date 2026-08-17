@@ -10,7 +10,7 @@ const docTemplate = `{
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
         "contact": {
-            "name": "EffiSupport",
+            "name": "Effi-Support",
             "url": "https://www.effiware.com/contact",
             "email": "contact@effiware.com"
         },
@@ -25,10 +25,7 @@ const docTemplate = `{
     "paths": {
         "/clicks": {
             "get": {
-                "description": "Retrieve the total number of clicks recorded in the system",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Total number of clicks recorded in the system",
                 "produces": [
                     "application/json"
                 ],
@@ -36,15 +33,19 @@ const docTemplate = `{
                     "clicks"
                 ],
                 "summary": "Get the number of clicks",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Clicks"
+                        }
+                    }
+                }
             }
         },
         "/clicks/increment": {
             "post": {
-                "description": "Increment the total number of clicks recorded in the system by one",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Increment the click total by one and return the new value",
                 "produces": [
                     "application/json"
                 ],
@@ -52,7 +53,57 @@ const docTemplate = `{
                     "clicks"
                 ],
                 "summary": "Increment the number of clicks",
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Clicks"
+                        }
+                    }
+                }
+            }
+        },
+        "/readyz": {
+            "get": {
+                "description": "200 when Postgres and Redis are reachable and the instance is not draining; 503 otherwise.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Readiness probe",
+                "responses": {
+                    "200": {
+                        "description": "ready",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "draining or a dependency is unreachable",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.Clicks": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "example": 17
+                }
             }
         }
     }
@@ -65,7 +116,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http"},
 	Title:            "GOTH Template API",
-	Description:      "This is an example server for a GOTH template application.",
+	Description:      "JSON API of the GOTH stack template.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

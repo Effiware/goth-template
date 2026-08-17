@@ -1,18 +1,86 @@
+networks:
+  goth-net:
+    external: false
+    name: goth-net
+
+volumes:
+  goth-db:
+    labels:
+      - "dev.goth.description=Application database storage"
+  redis-data:
+    labels:
+      - "dev.goth.description=Redis data"
+
 services:
-  goth-template:
+  goth-app:
     container_name: goth-template
-    image: effiware/goth-template:0.0.1
+    image: ghcr.io/effiware/goth-template:${BUILD_VERSION:-1.0.0}
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        BUILD_HASH: "abcd123"
+        SERVER_VERSION: ${BUILD_VERSION:-1.0.0}
+        BUILD_HASH: ${BUILD_HASH:-abcd123}
     platform: linux/amd64
-    ports:
-      - "8080:8080"
-      - "8081:8081"
-    env_file:
-      - .env
     restart: unless-stopped
+    profiles:
+      - whole
+    depends_on:
+      - goth-db
+      - redis
+      - jaeger
+    networks:
+      - goth-net
+    ports:
+      - "${SERVER_PORT:-8080}:${SERVER_PORT:-8080}"
+    environment:
+      - GOTH_TEMPLATE_SERVER_ENVIRONMENT=${ENV}
+      - GOTH_TEMPLATE_SERVER_PORT=${SERVER_PORT:-8080}
+      - GOTH_TEMPLATE_SERVER_BASE_URL=http://localhost:${SERVER_PORT:-8080}
+      - GOTH_TEMPLATE_DATABASE_URL=postgres://goth:STRONG_DB_PASSWORD1@goth-db:5432/goth
+      - GOTH_TEMPLATE_REDIS_URL=redis://:REDIS_PASSWORD@redis:6379/0
+      - GOTH_TEMPLATE_OTLP_URL=jaeger:4317
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
     security_opt:
       - no-new-privileges:true
+
+  goth-db:
+    image: postgres:17-alpine
+    container_name: goth-db
+    restart: unless-stopped
+    networks:
+      - goth-net
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - goth-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: goth
+      POSTGRES_USER: goth
+      POSTGRES_PASSWORD: STRONG_DB_PASSWORD1
+
+  redis:
+    image: redis:8-alpine
+    container_name: goth-redis
+    restart: unless-stopped
+    networks:
+      - goth-net
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    # volatile-ttl evicts the shortest-TTL keys first: cache entries go before
+    # sessions. Always set --maxmemory in production.
+    command: redis-server --loglevel warning --requirepass REDIS_PASSWORD --maxmemory-policy volatile-ttl
+
+  jaeger:
+    image: jaegertracing/jaeger:2.15.1
+    container_name: goth-jaeger
+    restart: unless-stopped
+    networks:
+      - goth-net
+    ports:
+      - "${JAEGER_UI_PORT:-8083}:16686"
+      - "4317:4317"
+      - "4318:4318"

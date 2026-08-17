@@ -1,9 +1,14 @@
 package components
 
-import "github.com/effiware/goth-template/internal/server/models"
-
-var clicks *models.Clicks = models.ClicksStore
-
-templ Click() {
-    <p id="parent-click" class="text-xl text-gray-800 mb-3">No of clicks (total): { clicks.GetCount() }</p>
+// Click is the HTMX swap target: total comes from Postgres (read through Redis),
+// mine from the session store.
+templ Click(total int64, mine int64) {
+	<div id="click-panel-counts">
+		<p class="text-xl">
+			Clicks (total): <span class="font-semibold">{ total }</span>
+		</p>
+		<p class="text-sm text-gray-600 dark:text-gray-400">
+			Clicks in your session: <span class="font-semibold">{ mine }</span>
+		</p>
+	</div>
 }

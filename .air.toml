@@ -3,17 +3,18 @@ tmp_dir = "bin"
 
 [build]
   args_bin = []
-  bin = "./bin/main"
-  cmd = "make notify-templ-proxy && npm run build && go build -tags local -o ./bin/main cmd/server/main.go"
+  entrypoint = ["./bin/main"]  # replaces the deprecated build.bin (air >= 1.67)
+  cmd = "make templ-notify-proxy && npm run build && go build -tags local -o ./bin/main ./cmd/server/"
   delay = 1000
-  exclude_dir = ["tmp", "bin"]
+  exclude_dir = ["tmp", "bin", "node_modules"]
   exclude_file = []
-  exclude_regex = [".*\\.txt$"]
+  # tailwind.css is this build's own output — watching it would retrigger air.
+  exclude_regex = [".*\\.txt$", "tailwind\\.css$"]
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""
   include_dir = []
-  include_ext = ["go", "html", "css", "templ"]
+  include_ext = ["go", "html", "css", "templ", "svg", "sql"]
   include_file = []
   kill_delay = "0s"
   log = "build-errors.log"
