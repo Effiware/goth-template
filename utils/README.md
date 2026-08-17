@@ -17,7 +17,7 @@ Wrappers compose via `Chain`, outermost-first:
 
 ```go
 pipeline := utils.Chain(
-    utils.RedisCacheForKeyTTL(rdb, "kc:orgs", 5*time.Minute, false),
+    utils.RedisCacheForKeyTTL(rdb, "api:orgs", 5*time.Minute, false),
     utils.RetryIf(isRetryable, 3, 500*time.Millisecond, 10*time.Second),
     utils.HTTPSuccess("2.."),
 )
@@ -70,8 +70,6 @@ baseline. Before publishing:
 
 - [ ] Remove `SendRetryableRequest` / `DeepCopyRequest` from `httputil.go` and confirm
       all call sites are covered by the new pattern
-- [ ] Run the Keycloak 401-refresh retry path under real traffic and verify the
-      token-refresh behaviour is preserved
 - [ ] Exercise `RetryIf` and `HTTPSuccess` against a staging environment to catch any
       edge cases not covered by unit tests
 - [ ] Add unit tests for `RedisCacheForKeyTTL`, `Retry`, `RetryIf`, `HTTPSuccess`, and

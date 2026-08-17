@@ -3,6 +3,7 @@ package hda
 import (
 	"errors"
 	"fmt"
+	"html"
 	"log/slog"
 	"net/http"
 	"time"
@@ -56,17 +57,21 @@ func WithHTMLFallback(viewHandler ViewHandlerT) http.HandlerFunc {
 		}
 		slog.Log(r.Context(), level, "ViewHandler error", "error", err, "path", r.URL.Path)
 
-		// Boosted navs swap hx-select="#main-content": a response missing that id
-		// would select nothing and delete the target.
-		boosted := r.Header.Get("HX-Boosted") != ""
+		// Fragments re-carry the target's id (boosted navs select #main-content,
+		// plain swaps the HX-Target id) — an outerHTML swap without it would
+		// delete the target and break every later request.
+		wrapID := r.Header.Get("HX-Target")
+		if r.Header.Get("HX-Boosted") != "" {
+			wrapID = "main-content"
+		}
 		writeFragment := func(status int, message string) {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(status)
-			if boosted {
-				fmt.Fprint(w, `<div id="main-content">`)
+			if wrapID != "" {
+				fmt.Fprintf(w, `<div id="%s">`, html.EscapeString(wrapID))
 			}
 			_ = components.ErrorPanel(message).Render(r.Context(), w)
-			if boosted {
+			if wrapID != "" {
 				fmt.Fprint(w, `</div>`)
 			}
 		}

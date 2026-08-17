@@ -38,8 +38,8 @@ type GatedRunStore interface {
 	TryWithSessionLock(ctx context.Context, key int64, fn func() error) (bool, error)
 }
 
-// serviceGateLockSalt keeps gate keys disjoint from the per-org advisory-lock
-// keyspace (OrgTickLockKey, taskOrgLockKey) and goose's migration lock.
+// serviceGateLockSalt keeps gate keys disjoint from other advisory-lock
+// keyspaces (e.g. goose's migration lock).
 const serviceGateLockSalt = uint64(0x53c7_0000_0000_0002)
 
 // serviceGateFreshnessFactor shrinks the window below the interval so an instance's
@@ -109,7 +109,7 @@ func warnIfGateWedged(ctx context.Context, store GatedRunStore, name string, int
 // window (~90% of interval, read while holding the lock). Both halves are
 // load-bearing — the lock alone misses staggered tickers, the freshness check alone
 // is a TOCTOU race. interval <= 0 keeps the lock but skips freshness ("run now,
-// never two at once" — the manual /admin trigger). A skip writes nothing to
+// never two at once" — e.g. a manual trigger). A skip writes nothing to
 // tech_service_runs. Reports whether svc ran.
 func RunIfDue(ctx context.Context, store GatedRunStore, name string, svc Servicer, interval time.Duration) (bool, error) {
 	ran := false

@@ -10,8 +10,8 @@ import (
 	"github.com/effiware/goth-template/internal/config"
 )
 
-// ScheduleTZ is hardcoded: schedules run in Polish local time whatever the host's
-// zone. Canonical value lives in config so Validate's gap walk agrees with the runner.
+// ScheduleTZ anchors schedules whatever the host's zone; the canonical value
+// lives in config so Validate's gap walk agrees with the runner.
 const ScheduleTZ = config.ScheduleTZ
 
 // maxScheduleLookback bounds the backward-gap search; a spec sparser than this is unusable.

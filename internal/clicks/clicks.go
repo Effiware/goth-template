@@ -5,12 +5,13 @@ package clicks
 
 import (
 	"context"
+	"log/slog"
 	"strconv"
+	"time"
 
 	"github.com/effiware/goth-template/internal/db"
 	"github.com/effiware/goth-template/utils"
 	"github.com/redis/go-redis/v9"
-	"time"
 )
 
 // CounterName keys the single row in the clicks table.
@@ -58,8 +59,8 @@ func (c *Counter) Count(ctx context.Context) (int64, error) {
 	return strconv.ParseInt(string(raw), 10, 64)
 }
 
-// Increment bumps the counter and drops the cached value. A failed DEL only
-// costs staleness until cacheTTL, so it is logged by the caller, not fatal.
+// Increment bumps the counter and drops the cached value. The DB write already
+// committed, so a failed DEL is only staleness (bounded by cacheTTL) — logged, not returned.
 func (c *Counter) Increment(ctx context.Context) (int64, error) {
 	count, err := c.store.IncrementClickCount(ctx, CounterName)
 	if err != nil {
@@ -67,7 +68,7 @@ func (c *Counter) Increment(ctx context.Context) (int64, error) {
 	}
 	if c.rdb != nil {
 		if err := c.rdb.Del(ctx, cachePrefix+":"+CounterName).Err(); err != nil {
-			return count, err
+			slog.WarnContext(ctx, "clicks: cache invalidation failed", "error", err)
 		}
 	}
 	return count, nil

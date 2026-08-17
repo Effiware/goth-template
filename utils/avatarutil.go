@@ -2,8 +2,8 @@ package utils
 
 import "github.com/jackc/pgx/v5/pgtype"
 
-// avatarPalette excludes amber, emerald, rose and sky: those hues already encode
-// assignment status and team role elsewhere, and identity must not collide with them.
+// avatarPalette excludes amber, emerald, rose and sky — hues typically used for
+// status colors, which identity must not collide with.
 var avatarPalette = [8]string{
 	"bg-violet-100 text-violet-700",
 	"bg-blue-100 text-blue-700",
@@ -24,7 +24,7 @@ func AvatarColorClasses(id pgtype.UUID) string {
 	return avatarPalette[int(id.Bytes[0])%len(avatarPalette)]
 }
 
-// AvatarColorClassesFromSub is the string-keyed variant (a Keycloak subject),
+// AvatarColorClassesFromSub is the string-keyed variant (e.g. an IdP subject),
 // agreeing with AvatarColorClasses for the same id.
 func AvatarColorClassesFromSub(sub string) string {
 	id, err := ParseUUID(sub)

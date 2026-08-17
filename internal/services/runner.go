@@ -31,7 +31,7 @@ func NewPeriodicRunner(name string, svc Servicer, store GatedRunStore, interval 
 }
 
 // NewUngatedPeriodicRunner ticks on every instance. Only for services whose work
-// self-partitions (the mailer's FOR UPDATE SKIP LOCKED) — gating those would
+// self-partitions (e.g. FOR UPDATE SKIP LOCKED claims) — gating those would
 // serialize useful parallelism.
 func NewUngatedPeriodicRunner(name string, svc Servicer, store GatedRunStore, interval time.Duration) *PeriodicRunner {
 	r := NewPeriodicRunner(name, svc, store, interval)
@@ -62,8 +62,8 @@ func (r *PeriodicRunner) ShutDown() {
 }
 
 // runBounded executes one pass under DefaultRunTimeout; shared with ScheduledRunner.
-// Cancellation is safe: the gate unlocks under WithoutCancel and every service either
-// runs per-org transactions or reclaims its claimed rows.
+// The gate unlocks under WithoutCancel even when the timeout fires mid-run — keep
+// Sync safe to interrupt.
 func runBounded(name string, svc Servicer, store GatedRunStore, interval time.Duration, gated bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultRunTimeout)
 	defer cancel()

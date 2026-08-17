@@ -8,8 +8,8 @@ import (
 
 // SecurityHeadersOptions configures the SecurityHeaders middleware.
 type SecurityHeadersOptions struct {
-	// ExtraImgOrigins are img-src origins beyond 'self'/data: — in practice the
-	// S3 presign origin (storage.public_endpoint). Empty entries are skipped.
+	// ExtraImgOrigins are img-src origins beyond 'self'/data: — e.g. an
+	// object-storage presign origin. Empty entries are skipped.
 	ExtraImgOrigins []string
 
 	// ReportOnly emits the -Report-Only header instead (server.csp_report_only):

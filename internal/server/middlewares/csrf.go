@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"fmt"
+	"html"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -8,9 +10,9 @@ import (
 	"go.opentelemetry.io/otel/codes"
 )
 
-// CSRFOriginCheck rejects non-safe methods whose Origin (or Referer) does not
-// prefix-match the app's own origin — sufficient for a cookie-session app whose
-// mutations all go over XHR, where browsers always send Origin.
+// CSRFOriginCheck rejects non-safe methods whose Origin (or Referer) is not the
+// app's own origin — sufficient for a cookie-session app whose mutations all go
+// over XHR, where browsers always send Origin.
 func CSRFOriginCheck(allowedOrigin string) func(http.Handler) http.Handler {
 	allowedOrigin = strings.TrimRight(allowedOrigin, "/")
 
@@ -29,7 +31,9 @@ func CSRFOriginCheck(allowedOrigin string) func(http.Handler) http.Handler {
 				origin = r.Header.Get("Referer")
 			}
 
-			if origin == "" || !strings.HasPrefix(origin, allowedOrigin) {
+			// Exact match, or the origin followed by "/" (a Referer is a full URL).
+			// A bare prefix would let https://app.example.com.evil.net through.
+			if origin == "" || (origin != allowedOrigin && !strings.HasPrefix(origin, allowedOrigin+"/")) {
 				span.SetStatus(codes.Error, "CSRF origin mismatch")
 				slog.WarnContext(ctx, "CSRF check failed",
 					"method", r.Method,
@@ -37,6 +41,13 @@ func CSRFOriginCheck(allowedOrigin string) func(http.Handler) http.Handler {
 					"origin", origin,
 					"expected", allowedOrigin,
 				)
+				// Re-carry the htmx target id: a swapped 403 must not delete its target.
+				if target := r.Header.Get("HX-Target"); target != "" {
+					w.Header().Set("Content-Type", "text/html; charset=utf-8")
+					w.WriteHeader(http.StatusForbidden)
+					fmt.Fprintf(w, `<div id="%s">CSRF origin check failed</div>`, html.EscapeString(target))
+					return
+				}
 				http.Error(w, "CSRF origin check failed", http.StatusForbidden)
 				return
 			}

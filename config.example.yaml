@@ -19,8 +19,8 @@ database:
   skip_migrations: false  # migrations run at startup; shouldn't be skipped in production
 #  pool_max_conns: 10  # unset = from the DSN, else pgx's max(4, NumCPU)
 
-# Empty url = no Redis: sessions fall back to cookie storage and the cache
-# wrappers become pass-through. Delete the section if the project never needs it.
+# Empty url = no Redis: the session store and cache wrappers switch off.
+# Delete the section if the project never needs it.
 redis:
   url: "redis://:REDIS_PASSWORD@localhost:6379/0"
 

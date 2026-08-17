@@ -53,6 +53,20 @@ func TestWithHTMLFallbackRedirectsUnauthenticatedHTMX(t *testing.T) {
 	assert.Equal(t, "/", rec.Header().Get("HX-Redirect"))
 }
 
+// An outerHTML swap deletes the target unless the fragment re-carries its id.
+func TestWithHTMLFallbackKeepsHtmxTarget(t *testing.T) {
+	handler := WithHTMLFallback(func(http.ResponseWriter, *http.Request) error {
+		return errors.New("boom")
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/clicked", nil)
+	req.Header.Set("HX-Target", "click-panel-counts")
+	rec := httptest.NewRecorder()
+	handler(rec, req)
+
+	assert.Contains(t, rec.Body.String(), `<div id="click-panel-counts">`)
+}
+
 // A boosted nav swaps #main-content by id — an error fragment missing that
 // wrapper would delete the target instead of replacing it.
 func TestWithHTMLFallbackWrapsBoostedFragment(t *testing.T) {
